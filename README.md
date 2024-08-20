@@ -21,3 +21,6 @@ This repository provides a Kubernetes CronJob configuration for automatically cl
 2. **Date Calculation**: The script calculates the cutoff date to determine which pods are older than 30 days.
 3. **Pod Selection**: It retrieves all pods in the specified namespace that are in the `Succeeded` phase.
 4. **Pod Deletion**: Pods older than 30 days are selected and deleted.
+
+## How To Apply
+** Just use command kubectl apply -f . and make sure you are in the right directory where all the yaml are present.
