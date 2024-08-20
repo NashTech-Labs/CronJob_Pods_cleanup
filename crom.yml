@@ -1,0 +1,28 @@
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: cleanup-old-pods
+  namespace: default
+spec:
+  schedule: "* * * * *"  # Runs every minute 
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          serviceAccountName: cleanup-old-pods-sa
+          containers:
+          - name: cleanup
+            image: bitnami/kubectl:latest  # Ensure it has both kubectl and jq
+            command:
+            - /bin/bash
+            - /scripts/cleanup-old-pods.sh
+            volumeMounts:
+            - name: script
+              mountPath: /scripts
+              readOnly: true
+          restartPolicy: OnFailure
+          volumes:
+          - name: script
+            configMap:
+              name: cleanup-old-pods
+

@@ -1,0 +1,38 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: cleanup-old-pods
+  namespace: default
+data:
+  cleanup-old-pods.sh: |
+    #!/bin/bash
+ 
+    # Define the namespace
+    NAMESPACE="default"
+ 
+    # Get the current date in epoch seconds
+    CURRENT_DATE=$(date +%s)
+ 
+    # Get the cutoff date (30 days ago in epoch seconds
+    CUTOFF_DATE=$(date -d '30 days ago' +%s)
+ 
+    # Get the list of all pods in the namespace
+    PODS=$(kubectl get pods --field-selector status.phase=Succeeded -n $NAMESPACE --ignore-not-found=true -o json)
+    # echo $PODS
+    # Check if there are any pods older than 30 days
+    OLD_PODS=$(echo "$PODS" | jq -r \
+      ' .items[] |
+        select(.status.startTime != null) |
+        select((.status.startTime | fromdateiso8601) < '"$CUTOFF_DATE"') |
+        .metadata.name')
+    # echo $OLD_PODS
+    if [ -z "$OLD_PODS" ]; then
+      echo "No pods older than 30 days . No action taken."
+      exit 0
+    fi
+ 
+    # Delete pods older than 30 days
+    for POD_NAME in $OLD_PODS; do
+      echo "Deleting pod $POD_NAME"
+      kubectl delete pod $POD_NAME -n $NAMESPACE
+    done
