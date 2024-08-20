@@ -23,4 +23,4 @@ This repository provides a Kubernetes CronJob configuration for automatically cl
 4. **Pod Deletion**: Pods older than 30 days are selected and deleted.
 
 ## How To Apply
-** Just use command kubectl apply -f . and make sure you are in the right directory where all the yaml are present.
+Just use command **kubectl apply -f .** and make sure you are in the right directory where all the yaml are present.
